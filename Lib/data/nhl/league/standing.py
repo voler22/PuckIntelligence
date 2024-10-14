@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from bs4 import BeautifulSoup
 import pandas as pd
 from selenium import webdriver
@@ -10,8 +10,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from Config.urls import URL_NHL_STANDING
 
 
-class Standing:
-    """Base class to import NHL standings."""
+class IStanding(ABC):
+    """Interface to import NHL standings."""
 
     def __init__(self, universe, standing_type):
         self._universe = universe
@@ -75,7 +75,7 @@ class Standing:
         return df
 
 
-class LeagueStanding(Standing):
+class LeagueStanding(IStanding):
     """Import NHL league standings."""
 
     def __init__(self, universe):
@@ -89,7 +89,7 @@ class LeagueStanding(Standing):
         return self._make(table, column_names, teams_ranked)
 
 
-class ConferenceStanding(Standing):
+class ConferenceStanding(IStanding):
     """Import NHL conference standings."""
 
     _CONFERENCES = {"Eastern": 0, "Western": 1}
@@ -112,7 +112,7 @@ class ConferenceStanding(Standing):
         self._universe.conference[conference]["standing"] = standing
 
 
-class DivisionStanding(Standing):
+class DivisionStanding(IStanding):
     """Import NHL division standings."""
 
     _DIVISIONS = {"Atlantic": 0, "Metropolitan": 1, "Central": 2, "Pacific": 3}
