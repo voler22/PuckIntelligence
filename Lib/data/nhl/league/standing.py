@@ -10,7 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from Config.urls import URL_NHL_STANDING
 
 
-class IStanding(ABC):
+class INHLStanding(ABC):
     """Interface to import NHL standings."""
 
     def __init__(self, universe, standing_type):
@@ -75,7 +75,7 @@ class IStanding(ABC):
         return df
 
 
-class LeagueStanding(IStanding):
+class NHLLeagueStanding(INHLStanding):
     """Import NHL league standings."""
 
     def __init__(self, universe):
@@ -89,7 +89,7 @@ class LeagueStanding(IStanding):
         return self._make(table, column_names, teams_ranked)
 
 
-class ConferenceStanding(IStanding):
+class NHLConferenceStanding(INHLStanding):
     """Import NHL conference standings."""
 
     _CONFERENCES = {"Eastern": 0, "Western": 1}
@@ -112,7 +112,7 @@ class ConferenceStanding(IStanding):
         self._universe.conference[conference]["standing"] = standing
 
 
-class DivisionStanding(IStanding):
+class NHLDivisionStanding(INHLStanding):
     """Import NHL division standings."""
 
     _DIVISIONS = {"Atlantic": 0, "Metropolitan": 1, "Central": 2, "Pacific": 3}
