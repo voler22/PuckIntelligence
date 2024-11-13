@@ -11,7 +11,8 @@ from typing import Any
 
 
 class NHLPlayer:
-    _BIO_CLASS = "sc-gUhVhA kPFQTO"
+    _BIO_CLASS = "sc-dvmEHd exznxd"
+    _GAME_LOG_ID = "GAME_LOGS-tabpanel"
 
     def __init__(
         self, universe: dict[str, Any], first_name: str, last_name: str, nhl_id: str
@@ -23,14 +24,16 @@ class NHLPlayer:
         self._url = URL_NHL_PLAYER.format(
             self._first_name.lower(), self._last_name.lower(), self._nhl_id
         )
+        self._html_content = self._get_html_content()
         self._player = {
             "profile": {},
+            "game_log": {},
         }
 
-    def make(self):
+    def make_bio(self):
         """Make NHL player bio."""
         bio_html = self._get_html_content()
-        self._make_player_bio(bio_html)
+        self._make_bio(bio_html)
 
     def _get_html_content(self):
         driver = webdriver.Chrome()
@@ -42,13 +45,12 @@ class NHLPlayer:
             html = driver.page_source
         finally:
             driver.quit()
-        soup = BeautifulSoup(html, "html.parser")
-        bio = soup.find("div", class_=self._BIO_CLASS)
-        return bio
+        return BeautifulSoup(html, "html.parser")
 
-    def _make_player_bio(self, bio_html):
-        bio_fields = bio_html.find_all("div")
-        for field in bio_fields:
+    def _make_bio(self, bio_html):
+        bio = self._html_content.find("div", class_=self._BIO_CLASS)
+        fields = bio.find_all("div")
+        for field in fields:
             list = field.text.split(": ")
             if list[0] == "Height":
                 self._player["profile"]["height (inches)"] = (
@@ -96,3 +98,12 @@ class NHLPlayer:
             "round": round,
             "pick": pick,
         }
+
+    def get_skater_game_log(self):
+        log = self._get_last_log()
+        print("nothing")
+
+    def _get_last_log(self):
+        logs = self._html_content.find("div", id=self._GAME_LOG_ID)
+        return logs.find("tr")
+
