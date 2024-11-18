@@ -1,5 +1,5 @@
 from Config.urls import URL_NHL_PLAYER
-from Config.teams import NHL_TEAMS_FOR_DRAFT
+from Config.teams import NHL_TEAMS_ACRONYMS
 from bs4 import BeautifulSoup
 import Lib.tools as t
 from selenium import webdriver
@@ -12,7 +12,6 @@ from typing import Any
 
 class NHLPlayer:
     _BIO_CLASS = "sc-dvmEHd exznxd"
-    _GAME_LOG_ID = "GAME_LOGS-tabpanel"
 
     def __init__(
         self, universe: dict[str, Any], first_name: str, last_name: str, nhl_id: str
@@ -30,11 +29,6 @@ class NHLPlayer:
             "game_log": {},
         }
 
-    def make_bio(self):
-        """Make NHL player bio."""
-        bio_html = self._get_html_content()
-        self._make_bio(bio_html)
-
     def _get_html_content(self):
         driver = webdriver.Chrome()
         try:
@@ -47,9 +41,13 @@ class NHLPlayer:
             driver.quit()
         return BeautifulSoup(html, "html.parser")
 
-    def _make_bio(self, bio_html):
+    def make_profile(self):
+        """Make NHL player bio."""
         bio = self._html_content.find("div", class_=self._BIO_CLASS)
         fields = bio.find_all("div")
+        self._player["profile"]["first_name"] = self._first_name
+        self._player["profile"]["last_name"] = self._last_name
+        self._player["profile"]["nhl_id"] = self._nhl_id
         for field in fields:
             list = field.text.split(": ")
             if list[0] == "Height":
@@ -84,7 +82,13 @@ class NHLPlayer:
 
     def _format_draft(self, draft):
         if draft == "Undrafted":
-            return draft
+            return {
+                "year": "NULL",
+                "team": "NULL",
+                "overall": "NULL",
+                "round": "NULL",
+                "pick": "NULL",
+            }
         draft_list_ = draft.split(", ")
         year = int(draft_list_[0])
         team = draft_list_[1][0:3]
@@ -93,17 +97,8 @@ class NHLPlayer:
         pick = int(re.sub(r"[^0-9]", "", draft_list_[3]))
         return {
             "year": year,
-            "team": NHL_TEAMS_FOR_DRAFT[team],
+            "team": NHL_TEAMS_ACRONYMS[team],
             "overall": overall,
             "round": round,
             "pick": pick,
         }
-
-    def get_skater_game_log(self):
-        log = self._get_last_log()
-        print("nothing")
-
-    def _get_last_log(self):
-        logs = self._html_content.find("div", id=self._GAME_LOG_ID)
-        return logs.find("tr")
-

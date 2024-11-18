@@ -1,5 +1,4 @@
 import datetime as dt
-import math
 
 
 def format_player_height_in_inches(height: str) -> int:
@@ -94,4 +93,36 @@ def get_birthdate_and_age(date: str, run_date: dt.date) -> dt.date:
             date__ = dt.datetime.strptime(date, "%b %d, %Y").date()
         except ValueError:
             raise ValueError("Date format unknown: {}".format(date))
-    return date__, math.floor((run_date - date__).days / 365.25)
+    return date__, round((run_date - date__).days / 365.242374, 3)
+
+
+def get_time_on_ice(time: str) -> float:
+    """Convert time on ice from string to float.
+
+    Parameters
+    ----------
+    time: str
+        Time on ice in string format.
+
+    Returns
+    -------
+    float
+        Time on ice in float format.
+    """
+    minutes, seconds = time.split(":")
+    return round(int(minutes) + int(seconds) / 60, 5)
+
+def format_game_log_date(date: str) -> dt.date:
+    """Format date.
+
+    Parameters
+    ----------
+    date: str
+        Date in string format.
+
+    Returns
+    -------
+    dt.date
+        Date in datetime format.
+    """
+    return dt.datetime.strptime(date, "%b %d, %y").date()

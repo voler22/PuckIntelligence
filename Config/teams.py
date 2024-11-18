@@ -32,7 +32,7 @@ NHL_TEAMS = {
     "Washington": "capitals",
     "Winnipeg": "jets",
 }
-NHL_TEAMS_FOR_DRAFT = {
+NHL_TEAMS_ACRONYMS = {
     "ANA": "Anaheim",
     "ATL": "Atlanta",
     "ARI": "Arizona",
